@@ -1,0 +1,175 @@
+<section class="students-page">
+  @if (errorMessage || successMessage) {
+    <div class="toast-container">
+      @if (errorMessage) {
+        <div class="toast-message toast-error">{{ errorMessage }}</div>
+      }
+
+      @if (successMessage) {
+        <div class="toast-message toast-success">{{ successMessage }}</div>
+      }
+    </div>
+  }
+
+  <div class="page-header">
+    <div>
+      <h2>Étudiants</h2>
+      <p>Gestion des étudiants</p>
+    </div>
+    <button class="btn btn-secondary" type="button" (click)="logout()">
+      Déconnexion
+    </button>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" type="button" (click)="openCreateModal()">
+      Ajouter
+    </button>
+    <button
+      class="btn btn-secondary"
+      type="button"
+      (click)="loadStudents()"
+      [disabled]="isLoading"
+    >
+      @if (isLoading) {
+        <span>Chargement...</span>
+      } @else {
+        <span>Recharger</span>
+      }
+    </button>
+  </div>
+
+  @if (!isLoading && !errorMessage && students.length === 0) {
+    <div class="status-message">Aucun étudiant trouvé.</div>
+  }
+
+  <h3>Étudiants</h3>
+
+  @if (students.length > 0) {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Prénom</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (student of students; track student.id) {
+            <tr>
+              <td>{{ student.id }}</td>
+              <td>{{ student.firstName }}</td>
+              <td>{{ student.lastName }}</td>
+              <td>{{ student.email }}</td>
+              <td class="action-cell">
+                <button class="icon-button" type="button" (click)="openDetailModal(student)" title="Voir">
+                  👁
+                </button>
+                <button class="icon-button" type="button" (click)="openEditModal(student)" title="Modifier">
+                  ✏️
+                </button>
+                <button class="icon-button delete-button" type="button" (click)="deleteStudent(student)" title="Supprimer">
+                  ❌
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  @if (isFormModalOpen) {
+    <div class="modal-backdrop" (click)="closeFormModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ isEditMode ? 'Modifier un étudiant' : 'Ajouter un étudiant' }}</h3>
+          <button class="close-button" type="button" (click)="closeFormModal()">❌</button>
+        </div>
+
+        <form [formGroup]="studentForm" (ngSubmit)="saveStudent()">
+          <div class="form-group">
+            <label for="firstName">Prénom</label>
+            <input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && form['firstName'].errors }"
+            />
+            @if (submitted && form['firstName'].errors) {
+              <div class="invalid-feedback">Le prénom est obligatoire.</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Nom</label>
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && form['lastName'].errors }"
+            />
+            @if (submitted && form['lastName'].errors) {
+              <div class="invalid-feedback">Le nom est obligatoire.</div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && form['email'].errors }"
+            />
+            @if (submitted && form['email'].errors) {
+              <div class="invalid-feedback">
+                @if (form['email'].errors?.['required']) {
+                  <div>L'email est obligatoire.</div>
+                }
+                @if (form['email'].errors?.['email']) {
+                  <div>Le format de l'email est invalide.</div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn btn-primary" type="submit" [disabled]="isLoading">
+              {{ isEditMode ? 'Enregistrer' : 'Ajouter' }}
+            </button>
+            <button class="btn btn-secondary" type="button" (click)="closeFormModal()">
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (isDetailModalOpen && selectedStudent) {
+    <div class="modal-backdrop" (click)="closeDetailModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Détail de l'étudiant</h3>
+          <button class="close-button" type="button" (click)="closeDetailModal()">❌</button>
+        </div>
+
+        <div class="detail-grid">
+          <p><strong>ID :</strong> {{ selectedStudent.id }}</p>
+          <p><strong>Prénom :</strong> {{ selectedStudent.firstName }}</p>
+          <p><strong>Nom :</strong> {{ selectedStudent.lastName }}</p>
+          <p><strong>Email :</strong> {{ selectedStudent.email }}</p>
+          <p><strong>Créé le :</strong> {{ selectedStudent.created_at }}</p>
+          <p><strong>Modifié le :</strong> {{ selectedStudent.updated_at }}</p>
+        </div>
+      </div>
+    </div>
+  }
+</section>

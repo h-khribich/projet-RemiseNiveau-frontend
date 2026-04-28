@@ -1,67 +1,74 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MaterialModule } from '../../shared/material.module';
-import { UserService } from '../../core/service/user.service';
-import { Register } from '../../core/models/Register';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { ApiError } from '../../core/models/ApiError';
+import { LoginRequest } from '../../core/models/LoginRequest';
+import { AuthService } from '../../core/service/auth.service';
+import { UserService } from '../../core/service/user.service';
+import { MaterialModule } from '../../shared/material.module';
 
 @Component({
-  selector: 'app-register',
-  imports: [CommonModule, MaterialModule, RouterLink],
-  templateUrl: './register.component.html',
+  selector: 'app-login',
   standalone: true,
-  styleUrl: './register.component.css'
+  imports: [CommonModule, MaterialModule, RouterLink],
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.css'
 })
-export class RegisterComponent implements OnInit {
+export class LoginComponent implements OnInit {
   private readonly messageDuration = 4000;
-  private userService = inject(UserService);
-  private formBuilder = inject(FormBuilder);
-  private destroyRef = inject(DestroyRef);
+  private readonly userService = inject(UserService);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
   private messageTimeoutId: number | null = null;
-  registerForm: FormGroup = new FormGroup({});
+
+  loginForm: FormGroup = new FormGroup({});
   submitted = false;
   isLoading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
+  token: string | null = null;
 
-  ngOnInit() {
-    this.registerForm = this.formBuilder.group(
-      {
-        firstName: ['', Validators.required],
-        lastName: ['', Validators.required],
-        login: ['', Validators.required],
-        password: ['', Validators.required]
-      },
-    );
+  ngOnInit(): void {
+    this.loginForm = this.formBuilder.group({
+      login: ['', Validators.required],
+      password: ['', Validators.required]
+    });
   }
 
   get form() {
-    return this.registerForm.controls;
+    return this.loginForm.controls;
   }
 
   onSubmit(): void {
     this.submitted = true;
     this.clearMessages();
-    if (this.registerForm.invalid) {
+    this.token = null;
+
+    if (this.loginForm.invalid) {
       return;
     }
+
     this.isLoading = true;
-    const registerUser: Register = {
-      firstName: this.registerForm.get('firstName')?.value,
-      lastName: this.registerForm.get('lastName')?.value,
-      login: this.registerForm.get('login')?.value,
-      password: this.registerForm.get('password')?.value
+
+    const credentials: LoginRequest = {
+      login: this.loginForm.get('login')?.value,
+      password: this.loginForm.get('password')?.value
     };
-    this.userService.register(registerUser)
+
+    this.userService.login(credentials)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
+        next: (jwtToken) => {
           this.isLoading = false;
-          this.setSuccessMessage('Inscription réussie. Vous pouvez maintenant vous connecter.');
+          this.authService.saveToken(jwtToken);
+          this.token = jwtToken;
+          this.setSuccessMessage('Authentification réussie.');
+          void this.router.navigate(['/students']);
         },
         error: (error: HttpErrorResponse) => {
           this.isLoading = false;
@@ -74,7 +81,8 @@ export class RegisterComponent implements OnInit {
     this.submitted = false;
     this.isLoading = false;
     this.clearMessages();
-    this.registerForm.reset();
+    this.token = null;
+    this.loginForm.reset();
   }
 
   private getErrorMessage(error: HttpErrorResponse): string {
@@ -88,7 +96,7 @@ export class RegisterComponent implements OnInit {
       return apiError.message;
     }
 
-    return 'Une erreur est survenue lors de l\'inscription.';
+    return 'Une erreur est survenue lors de la connexion.';
   }
 
   private setSuccessMessage(message: string): void {
