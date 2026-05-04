@@ -1,28 +1,28 @@
-<section class="students-page">
+<section class="students-page" data-test="studentsPage">
   @if (errorMessage || successMessage) {
-    <div class="toast-container">
+    <div class="toast-container" data-test="studentsToastContainer">
       @if (errorMessage) {
-        <div class="toast-message toast-error">{{ errorMessage }}</div>
+        <div class="toast-message toast-error" data-test="studentsErrorToast">{{ errorMessage }}</div>
       }
 
       @if (successMessage) {
-        <div class="toast-message toast-success">{{ successMessage }}</div>
+        <div class="toast-message toast-success" data-test="studentsSuccessToast">{{ successMessage }}</div>
       }
     </div>
   }
 
-  <div class="page-header">
-    <div>
-      <h2>Étudiants</h2>
-      <p>Gestion des étudiants</p>
+  <div class="page-header" data-test="studentsHeader">
+    <div data-test="studentsHeaderContent">
+      <h2 data-test="studentsTitle">Étudiants</h2>
+      <p data-test="studentsSubtitle">Gestion des étudiants</p>
     </div>
-    <button class="btn btn-secondary" type="button" (click)="logout()">
+    <button class="btn btn-secondary" type="button" (click)="logout()" data-test="logoutBtn">
       Déconnexion
     </button>
   </div>
 
-  <div class="actions">
-    <button class="btn btn-primary" type="button" (click)="openCreateModal()">
+  <div class="actions" data-test="studentsActions">
+    <button class="btn btn-primary" type="button" (click)="openCreateModal()" data-test="addStudentBtn">
       Ajouter
     </button>
     <button
@@ -30,6 +30,7 @@
       type="button"
       (click)="loadStudents()"
       [disabled]="isLoading"
+      data-test="reloadStudentsBtn"
     >
       @if (isLoading) {
         <span>Chargement...</span>
@@ -40,16 +41,16 @@
   </div>
 
   @if (!isLoading && !errorMessage && students.length === 0) {
-    <div class="status-message">Aucun étudiant trouvé.</div>
+    <div class="status-message" data-test="emptyStudentsState">Aucun étudiant trouvé.</div>
   }
 
-  <h3>Étudiants</h3>
+  <h3 data-test="studentsSectionTitle">Étudiants</h3>
 
   @if (students.length > 0) {
-    <div class="table-wrapper">
-      <table>
+    <div class="table-wrapper" data-test="studentsTableWrapper">
+      <table data-test="studentsTable">
         <thead>
-          <tr>
+          <tr data-test="studentsTableHeaderRow">
             <th>ID</th>
             <th>Prénom</th>
             <th>Nom</th>
@@ -59,19 +60,19 @@
         </thead>
         <tbody>
           @for (student of students; track student.id) {
-            <tr>
-              <td>{{ student.id }}</td>
-              <td>{{ student.firstName }}</td>
-              <td>{{ student.lastName }}</td>
-              <td>{{ student.email }}</td>
-              <td class="action-cell">
-                <button class="icon-button" type="button" (click)="openDetailModal(student)" title="Voir">
+            <tr [attr.data-test]="'studentRow-' + student.id">
+              <td [attr.data-test]="'studentId-' + student.id">{{ student.id }}</td>
+              <td [attr.data-test]="'studentFirstName-' + student.id">{{ student.firstName }}</td>
+              <td [attr.data-test]="'studentLastName-' + student.id">{{ student.lastName }}</td>
+              <td [attr.data-test]="'studentEmail-' + student.id">{{ student.email }}</td>
+              <td class="action-cell" [attr.data-test]="'studentActions-' + student.id">
+                <button class="icon-button" type="button" (click)="openDetailModal(student)" title="Voir" [attr.data-test]="'viewStudentBtn-' + student.id">
                   👁
                 </button>
-                <button class="icon-button" type="button" (click)="openEditModal(student)" title="Modifier">
+                <button class="icon-button" type="button" (click)="openEditModal(student)" title="Modifier" [attr.data-test]="'editStudentBtn-' + student.id">
                   ✏️
                 </button>
-                <button class="icon-button delete-button" type="button" (click)="deleteStudent(student)" title="Supprimer">
+                <button class="icon-button delete-button" type="button" (click)="deleteStudent(student)" title="Supprimer" [attr.data-test]="'deleteStudentBtn-' + student.id">
                   ❌
                 </button>
               </td>
@@ -83,53 +84,56 @@
   }
 
   @if (isFormModalOpen) {
-    <div class="modal-backdrop" (click)="closeFormModal()">
-      <div class="modal-card" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>{{ isEditMode ? 'Modifier un étudiant' : 'Ajouter un étudiant' }}</h3>
-          <button class="close-button" type="button" (click)="closeFormModal()">❌</button>
+    <div class="modal-backdrop" (click)="closeFormModal()" data-test="studentFormModalBackdrop">
+      <div class="modal-card" (click)="$event.stopPropagation()" data-test="studentFormModal">
+        <div class="modal-header" data-test="studentFormModalHeader">
+          <h3 data-test="studentFormModalTitle">{{ isEditMode ? 'Modifier un étudiant' : 'Ajouter un étudiant' }}</h3>
+          <button class="close-button" type="button" (click)="closeFormModal()" data-test="closeStudentFormModalBtn">❌</button>
         </div>
 
-        <form [formGroup]="studentForm" (ngSubmit)="saveStudent()">
-          <div class="form-group">
-            <label for="firstName">Prénom</label>
+        <form [formGroup]="studentForm" (ngSubmit)="saveStudent()" data-test="studentForm">
+          <div class="form-group" data-test="studentFirstNameFieldGroup">
+            <label for="firstName" data-test="studentFirstNameLabel">Prénom</label>
             <input
               id="firstName"
               type="text"
               formControlName="firstName"
+              data-test="studentFirstNameInput"
               class="form-control"
               [ngClass]="{ 'is-invalid': submitted && form['firstName'].errors }"
             />
             @if (submitted && form['firstName'].errors) {
-              <div class="invalid-feedback">Le prénom est obligatoire.</div>
+              <div class="invalid-feedback" data-test="studentFirstNameInputError">Le prénom est obligatoire.</div>
             }
           </div>
 
-          <div class="form-group">
-            <label for="lastName">Nom</label>
+          <div class="form-group" data-test="studentLastNameFieldGroup">
+            <label for="lastName" data-test="studentLastNameLabel">Nom</label>
             <input
               id="lastName"
               type="text"
               formControlName="lastName"
+              data-test="studentLastNameInput"
               class="form-control"
               [ngClass]="{ 'is-invalid': submitted && form['lastName'].errors }"
             />
             @if (submitted && form['lastName'].errors) {
-              <div class="invalid-feedback">Le nom est obligatoire.</div>
+              <div class="invalid-feedback" data-test="studentLastNameInputError">Le nom est obligatoire.</div>
             }
           </div>
 
-          <div class="form-group">
-            <label for="email">Email</label>
+          <div class="form-group" data-test="studentEmailFieldGroup">
+            <label for="email" data-test="studentEmailLabel">Email</label>
             <input
               id="email"
               type="email"
               formControlName="email"
+              data-test="studentEmailInput"
               class="form-control"
               [ngClass]="{ 'is-invalid': submitted && form['email'].errors }"
             />
             @if (submitted && form['email'].errors) {
-              <div class="invalid-feedback">
+              <div class="invalid-feedback" data-test="studentEmailInputError">
                 @if (form['email'].errors?.['required']) {
                   <div>L'email est obligatoire.</div>
                 }
@@ -140,11 +144,11 @@
             }
           </div>
 
-          <div class="modal-actions">
-            <button class="btn btn-primary" type="submit" [disabled]="isLoading">
+          <div class="modal-actions" data-test="studentFormActions">
+            <button class="btn btn-primary" type="submit" [disabled]="isLoading" data-test="studentFormSubmitBtn">
               {{ isEditMode ? 'Enregistrer' : 'Ajouter' }}
             </button>
-            <button class="btn btn-secondary" type="button" (click)="closeFormModal()">
+            <button class="btn btn-secondary" type="button" (click)="closeFormModal()" data-test="studentFormCancelBtn">
               Annuler
             </button>
           </div>
@@ -154,20 +158,20 @@
   }
 
   @if (isDetailModalOpen && selectedStudent) {
-    <div class="modal-backdrop" (click)="closeDetailModal()">
-      <div class="modal-card" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h3>Détail de l'étudiant</h3>
-          <button class="close-button" type="button" (click)="closeDetailModal()">❌</button>
+    <div class="modal-backdrop" (click)="closeDetailModal()" data-test="studentDetailModalBackdrop">
+      <div class="modal-card" (click)="$event.stopPropagation()" data-test="studentDetailModal">
+        <div class="modal-header" data-test="studentDetailModalHeader">
+          <h3 data-test="studentDetailModalTitle">Détail de l'étudiant</h3>
+          <button class="close-button" type="button" (click)="closeDetailModal()" data-test="closeStudentDetailModalBtn">❌</button>
         </div>
 
-        <div class="detail-grid">
-          <p><strong>ID :</strong> {{ selectedStudent.id }}</p>
-          <p><strong>Prénom :</strong> {{ selectedStudent.firstName }}</p>
-          <p><strong>Nom :</strong> {{ selectedStudent.lastName }}</p>
-          <p><strong>Email :</strong> {{ selectedStudent.email }}</p>
-          <p><strong>Créé le :</strong> {{ selectedStudent.created_at }}</p>
-          <p><strong>Modifié le :</strong> {{ selectedStudent.updated_at }}</p>
+        <div class="detail-grid" data-test="studentDetailContent">
+          <p data-test="studentDetailId"><strong>ID :</strong> {{ selectedStudent.id }}</p>
+          <p data-test="studentDetailFirstName"><strong>Prénom :</strong> {{ selectedStudent.firstName }}</p>
+          <p data-test="studentDetailLastName"><strong>Nom :</strong> {{ selectedStudent.lastName }}</p>
+          <p data-test="studentDetailEmail"><strong>Email :</strong> {{ selectedStudent.email }}</p>
+          <p data-test="studentDetailCreatedAt"><strong>Créé le :</strong> {{ selectedStudent.created_at }}</p>
+          <p data-test="studentDetailUpdatedAt"><strong>Modifié le :</strong> {{ selectedStudent.updated_at }}</p>
         </div>
       </div>
     </div>

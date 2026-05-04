@@ -1,34 +1,36 @@
-<div class="card m-3">
-  <h5 class="card-header">Formulaire d’inscription</h5>
-  <div class="card-body">
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-      <div class="form-row">
-        <div class="form-group col-5">
-          <label>Prénom</label>
+<div class="card m-3" data-test="registerCard">
+  <h5 class="card-header" data-test="registerTitle">Formulaire d’inscription</h5>
+  <div class="card-body" data-test="registerBody">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" data-test="registerForm">
+      <div class="form-row" data-test="registerNameRow">
+        <div class="form-group col-5" data-test="firstNameFieldGroup">
+          <label data-test="firstNameLabel">Prénom</label>
           <input
             type="text"
             formControlName="firstName"
+            data-test="firstNameInput"
             class="form-control"
             [ngClass]="{ 'is-invalid': submitted && form['firstName'].errors }"
           />
           @if (submitted && form["firstName"].errors) {
-            <div class="invalid-feedback">
+            <div class="invalid-feedback" data-test="firstNameInputError">
               @if (form["firstName"].errors?.["required"]) {
                 <div>Le prénom est obligatoire.</div>
               }
             </div>
           }
         </div>
-        <div class="form-group col-5">
-          <label>Nom</label>
+        <div class="form-group col-5" data-test="lastNameFieldGroup">
+          <label data-test="lastNameLabel">Nom</label>
           <input
             type="text"
             formControlName="lastName"
+            data-test="lastNameInput"
             class="form-control"
             [ngClass]="{ 'is-invalid': submitted && form['lastName'].errors }"
           />
           @if (submitted && form["lastName"].errors) {
-            <div class="invalid-feedback">
+            <div class="invalid-feedback" data-test="lastNameInputError">
               @if (form["lastName"].errors?.["required"]) {
                 <div>Le nom est obligatoire.</div>
               }
@@ -36,16 +38,17 @@
           }
         </div>
       </div>
-      <div class="form-group">
-        <label>Identifiant</label>
+      <div class="form-group" data-test="registerLoginFieldGroup">
+        <label data-test="registerLoginLabel">Identifiant</label>
         <input
           type="text"
           formControlName="login"
+          data-test="registerLoginInput"
           class="form-control"
           [ngClass]="{ 'is-invalid': submitted && form['login'].errors }"
         />
         @if (submitted && form["login"].errors) {
-          <div class="invalid-feedback">
+          <div class="invalid-feedback" data-test="registerLoginInputError">
             @if (form["login"].errors?.["required"]) {
               <div>L’identifiant est obligatoire.</div>
             }
@@ -53,16 +56,17 @@
         }
       </div>
 
-      <div class="form-group">
-        <label>Mot de passe</label>
+      <div class="form-group" data-test="registerPasswordFieldGroup">
+        <label data-test="registerPasswordLabel">Mot de passe</label>
         <input
           type="password"
           formControlName="password"
+          data-test="registerPasswordInput"
           class="form-control"
           [ngClass]="{ 'is-invalid': submitted && form['password'].errors }"
         />
         @if (submitted && form["password"].errors) {
-          <div class="invalid-feedback">
+          <div class="invalid-feedback" data-test="registerPasswordInputError">
             @if (form["password"].errors?.["required"]) {
               <div>Le mot de passe est obligatoire.</div>
             }
@@ -71,15 +75,15 @@
       </div>
 
       @if (errorMessage) {
-        <div class="alert alert-danger">{{ errorMessage }}</div>
+        <div class="alert alert-danger" data-test="registerErrorAlert">{{ errorMessage }}</div>
       }
 
       @if (successMessage) {
-        <div class="alert alert-success">{{ successMessage }}</div>
+        <div class="alert alert-success" data-test="registerSuccessAlert">{{ successMessage }}</div>
       }
 
-      <div class="text-center">
-        <button class="btn btn-primary mr-1" [disabled]="isLoading">
+      <div class="text-center" data-test="registerActions">
+        <button class="btn btn-primary mr-1" [disabled]="isLoading" data-test="registerSubmitBtn">
           @if (isLoading) {
             <span>Inscription en cours...</span>
           } @else {
@@ -91,14 +95,15 @@
           type="button"
           (click)="onReset()"
           [disabled]="isLoading"
+          data-test="registerResetBtn"
         >
           Réinitialiser
         </button>
       </div>
     </form>
 
-    <div class="text-center mt-3">
-      <button class="btn btn-outline-primary" type="button" routerLink="/login">
+    <div class="text-center mt-3" data-test="loginRedirectWrapper">
+      <button class="btn btn-outline-primary" type="button" routerLink="/login" data-test="loginRedirectBtn">
         Se connecter
       </button>
     </div>

@@ -1,18 +1,31 @@
-<div class="auth-card">
-  <h2>Connexion</h2>
+@if (errorMessage || successMessage) {
+  <div class="toast-container" data-test="loginToastContainer">
+    @if (errorMessage) {
+      <div class="toast-message toast-error" data-test="loginErrorToast">{{ errorMessage }}</div>
+    }
 
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="login">Identifiant</label>
+    @if (successMessage) {
+      <div class="toast-message toast-success" data-test="loginSuccessToast">{{ successMessage }}</div>
+    }
+  </div>
+}
+
+<div class="auth-card" data-test="loginCard">
+  <h2 data-test="loginTitle">Connexion</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" data-test="loginForm">
+    <div class="form-group" data-test="loginFieldGroup">
+      <label for="login" data-test="loginLabel">Identifiant</label>
       <input
         id="login"
         type="text"
         formControlName="login"
+        data-test="loginInput"
         class="form-control"
         [ngClass]="{ 'is-invalid': submitted && form['login'].errors }"
       />
       @if (submitted && form["login"].errors) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback" data-test="loginInputError">
           @if (form["login"].errors?.["required"]) {
             <div>L’identifiant est obligatoire.</div>
           }
@@ -20,17 +33,18 @@
       }
     </div>
 
-    <div class="form-group">
-      <label for="password">Mot de passe</label>
+    <div class="form-group" data-test="passwordFieldGroup">
+      <label for="password" data-test="passwordLabel">Mot de passe</label>
       <input
         id="password"
         type="password"
         formControlName="password"
+        data-test="passwordInput"
         class="form-control"
         [ngClass]="{ 'is-invalid': submitted && form['password'].errors }"
       />
       @if (submitted && form["password"].errors) {
-        <div class="invalid-feedback">
+        <div class="invalid-feedback" data-test="passwordInputError">
           @if (form["password"].errors?.["required"]) {
             <div>Le mot de passe est obligatoire.</div>
           }
@@ -38,23 +52,15 @@
       }
     </div>
 
-    @if (errorMessage) {
-      <div class="status-message status-error">{{ errorMessage }}</div>
-    }
-
-    @if (successMessage) {
-      <div class="status-message status-success">{{ successMessage }}</div>
-    }
-
     @if (token) {
-      <div class="token-box">
+      <div class="token-box" data-test="tokenBox">
         <strong>Token :</strong>
-        <p>{{ token }}</p>
+        <p data-test="tokenValue">{{ token }}</p>
       </div>
     }
 
-    <div class="actions">
-      <button class="btn btn-primary" type="submit" [disabled]="isLoading">
+    <div class="actions" data-test="loginActions">
+      <button class="btn btn-primary" type="submit" [disabled]="isLoading" data-test="submitBtn">
         @if (isLoading) {
           <span>Connexion en cours...</span>
         } @else {
@@ -66,14 +72,15 @@
         type="button"
         (click)="onReset()"
         [disabled]="isLoading"
+        data-test="resetBtn"
       >
         Réinitialiser
       </button>
     </div>
   </form>
 
-  <p class="helper-link">
+  <p class="helper-link" data-test="registerLinkWrapper">
     Pas encore de compte ?
-    <a routerLink="/register">Créer un compte</a>
+    <a routerLink="/register" data-test="registerLink">Créer un compte</a>
   </p>
 </div>

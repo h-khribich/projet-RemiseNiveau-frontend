@@ -87,12 +87,20 @@ export class LoginComponent implements OnInit {
 
   private getErrorMessage(error: HttpErrorResponse): string {
     if (typeof error.error === 'string' && error.error.trim()) {
+      if (error.error.includes('Invalid credentials')) {
+        return 'Identifiant ou mot de passe invalide.';
+      }
+
       return error.error;
     }
 
     const apiError = error.error as ApiError | null;
 
     if (apiError?.message) {
+      if (apiError.message === 'Invalid credentials') {
+        return 'Identifiant ou mot de passe invalide.';
+      }
+
       return apiError.message;
     }
 

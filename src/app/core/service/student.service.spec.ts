@@ -1,6 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
 import { StudentService } from './student.service';
 
 describe('StudentService', () => {
@@ -9,10 +12,7 @@ describe('StudentService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        provideHttpClient(),
-        provideHttpClientTesting()
-      ]
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     });
 
     service = TestBed.inject(StudentService);
@@ -40,8 +40,8 @@ describe('StudentService', () => {
         lastName: 'Doe',
         email: 'john@doe.com',
         created_at: '2026-04-28T08:00:00',
-        updated_at: '2026-04-28T08:00:00'
-      }
+        updated_at: '2026-04-28T08:00:00',
+      },
     ]);
   });
 
@@ -60,18 +60,20 @@ describe('StudentService', () => {
       lastName: 'Doe',
       email: 'john@doe.com',
       created_at: '2026-04-28T08:00:00',
-      updated_at: '2026-04-28T08:00:00'
+      updated_at: '2026-04-28T08:00:00',
     });
   });
 
   it('should create a student', () => {
-    service.create({
-      firstName: 'Jane',
-      lastName: 'Doe',
-      email: 'jane@doe.com'
-    }).subscribe((student) => {
-      expect(student.id).toBe(2);
-    });
+    service
+      .create({
+        firstName: 'Jane',
+        lastName: 'Doe',
+        email: 'jane@doe.com',
+      })
+      .subscribe((student) => {
+        expect(student.id).toBe(2);
+      });
 
     const request = httpTestingController.expectOne('/api/students');
 
@@ -83,18 +85,20 @@ describe('StudentService', () => {
       lastName: 'Doe',
       email: 'jane@doe.com',
       created_at: '2026-04-28T08:00:00',
-      updated_at: '2026-04-28T08:00:00'
+      updated_at: '2026-04-28T08:00:00',
     });
   });
 
   it('should update a student', () => {
-    service.update(1, {
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane@smith.com'
-    }).subscribe((student) => {
-      expect(student.lastName).toBe('Smith');
-    });
+    service
+      .update(1, {
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'jane@smith.com',
+      })
+      .subscribe((student) => {
+        expect(student.lastName).toBe('Smith');
+      });
 
     const request = httpTestingController.expectOne('/api/students/1');
 
@@ -106,7 +110,7 @@ describe('StudentService', () => {
       lastName: 'Smith',
       email: 'jane@smith.com',
       created_at: '2026-04-28T08:00:00',
-      updated_at: '2026-04-28T08:00:00'
+      updated_at: '2026-04-28T08:00:00',
     });
   });
 
