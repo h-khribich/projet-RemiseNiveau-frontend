@@ -60,22 +60,23 @@ describe('Login component integration test', () => {
     loginForm: () =>
       fixture.nativeElement.querySelector(
         `[${SELECTORS.loginForm}]`,
-      ) as HTMLButtonElement | null,
+      ) as HTMLFormElement | null,
     loginInputError: () =>
       fixture.nativeElement.querySelector(
         `[${SELECTORS.loginInputError}]`,
-      ) as HTMLButtonElement | null,
+      ) as HTMLElement | null,
     passwordInputError: () =>
       fixture.nativeElement.querySelector(
         `[${SELECTORS.passwordInputError}]`,
-      ) as HTMLButtonElement | null,
+      ) as HTMLElement | null,
     loginToastContainer: () =>
       fixture.nativeElement.querySelector(
         `[${SELECTORS.loginToastContainer}]`,
-      ) as HTMLButtonElement | null,
+      ) as HTMLElement | null,
   };
 
   beforeEach(async () => {
+    jest.useFakeTimers();
     await TestBed.configureTestingModule({
       imports: [LoginComponent],
       providers: [
@@ -100,6 +101,10 @@ describe('Login component integration test', () => {
     userService = TestBed.inject(UserService);
     authService = TestBed.inject(AuthService);
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it('login with valid credentials', () => {
@@ -187,5 +192,11 @@ describe('Login component integration test', () => {
     expect(ui.loginToastContainer()?.textContent).toContain(
       'Identifiant ou mot de passe invalide.',
     );
+
+    // Simulate the toast auto-dismissal after 3 seconds
+    jest.advanceTimersByTime(4100);
+    fixture.detectChanges();
+
+    expect(ui.loginToastContainer()).toBeFalsy();
   });
 });
