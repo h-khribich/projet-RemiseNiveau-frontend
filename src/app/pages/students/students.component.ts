@@ -35,8 +35,10 @@ export class StudentsComponent implements OnInit {
   submitted = false;
   isFormModalOpen = false;
   isDetailModalOpen = false;
+  isDeleteModalOpen = false;
   isEditMode = false;
   selectedStudent: Student | null = null;
+  studentPendingDeletion: Student | null = null;
 
   ngOnInit(): void {
     this.studentForm = this.formBuilder.group({
@@ -111,6 +113,12 @@ export class StudentsComponent implements OnInit {
       });
   }
 
+  openDeleteModal(student: Student): void {
+    this.clearMessages();
+    this.studentPendingDeletion = student;
+    this.isDeleteModalOpen = true;
+  }
+
   closeFormModal(): void {
     this.isFormModalOpen = false;
     this.submitted = false;
@@ -120,6 +128,11 @@ export class StudentsComponent implements OnInit {
   closeDetailModal(): void {
     this.isDetailModalOpen = false;
     this.selectedStudent = null;
+  }
+
+  closeDeleteModal(): void {
+    this.isDeleteModalOpen = false;
+    this.studentPendingDeletion = null;
   }
 
   saveStudent(): void {
@@ -166,12 +179,11 @@ export class StudentsComponent implements OnInit {
       });
   }
 
-  deleteStudent(student: Student): void {
+  confirmDeleteStudent(): void {
     this.clearMessages();
+    const student = this.studentPendingDeletion;
 
-    const confirmed = window.confirm(`Supprimer l'étudiant ${student.firstName} ${student.lastName} ?`);
-
-    if (!confirmed) {
+    if (!student) {
       return;
     }
 
@@ -184,6 +196,7 @@ export class StudentsComponent implements OnInit {
           this.students = this.students.filter((currentStudent) => currentStudent.id !== student.id);
           this.setSuccessMessage('Étudiant supprimé avec succès.');
           this.isLoading = false;
+          this.closeDeleteModal();
         },
         error: (error: HttpErrorResponse) => {
           this.isLoading = false;

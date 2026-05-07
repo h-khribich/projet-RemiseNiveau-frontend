@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StudentsComponent } from '../app/pages/students/students.component';
-import { AuthService } from '../app/core/service/auth.service';
 import { provideRouter } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -34,8 +33,13 @@ const SELECTORS = {
   viewStudent: 'data-test="viewStudentBtn-1"',
   editStudent: 'data-test="editStudentBtn-1"',
   deleteStudent: 'data-test="deleteStudentBtn-1"',
+  deleteStudentTwo: 'data-test="deleteStudentBtn-2"',
   studentDetail: 'data-test="studentDetailModal"',
   studentEditForm: 'data-test="studentFormModal"',
+  studentDeleteModal: 'data-test="studentDeleteModal"',
+  studentDeleteModalMessage: 'data-test="studentDeleteModalMessage"',
+  confirmStudentDeleteBtn: 'data-test="confirmStudentDeleteBtn"',
+  cancelStudentDeleteBtn: 'data-test="cancelStudentDeleteBtn"',
   studentFirstNameInput: 'data-test="studentFirstNameInput"',
   studentLastNameInput: 'data-test="studentLastNameInput"',
   studentEmailInput: 'data-test="studentEmailInput"',
@@ -45,12 +49,12 @@ const SELECTORS = {
   studentFormModalTitle: 'data-test="studentFormModalTitle"',
   studentSuccessToast: 'data-test="studentsSuccessToast"',
   closeStudentDetailModal: 'data-test="closeStudentDetailModalBtn"',
+  emptyStudentsState: 'data-test="emptyStudentsState"',
 };
 
 describe('Student component integration test', () => {
   let component: StudentsComponent;
   let fixture: ComponentFixture<StudentsComponent>;
-  let authService: AuthService;
 
   const ui = {
     studentComponent: () =>
@@ -105,6 +109,10 @@ describe('Student component integration test', () => {
       fixture.nativeElement.querySelector(
         `[${SELECTORS.deleteStudent}]`,
       ) as HTMLButtonElement | null,
+    deleteStudentTwo: () =>
+      fixture.nativeElement.querySelector(
+        `[${SELECTORS.deleteStudentTwo}]`,
+      ) as HTMLButtonElement | null,
     studentDetail: () =>
       fixture.nativeElement.querySelector(
         `[${SELECTORS.studentDetail}]`,
@@ -113,6 +121,22 @@ describe('Student component integration test', () => {
       fixture.nativeElement.querySelector(
         `[${SELECTORS.studentEditForm}]`,
       ) as HTMLElement | null,
+    studentDeleteModal: () =>
+      fixture.nativeElement.querySelector(
+        `[${SELECTORS.studentDeleteModal}]`,
+      ) as HTMLElement | null,
+    studentDeleteModalMessage: () =>
+      fixture.nativeElement.querySelector(
+        `[${SELECTORS.studentDeleteModalMessage}]`,
+      ) as HTMLElement | null,
+    confirmStudentDeleteBtn: () =>
+      fixture.nativeElement.querySelector(
+        `[${SELECTORS.confirmStudentDeleteBtn}]`,
+      ) as HTMLButtonElement | null,
+    cancelStudentDeleteBtn: () =>
+      fixture.nativeElement.querySelector(
+        `[${SELECTORS.cancelStudentDeleteBtn}]`,
+      ) as HTMLButtonElement | null,
     studentFirstNameInput: () =>
       fixture.nativeElement.querySelector(
         `[${SELECTORS.studentFirstNameInput}]`,
@@ -149,6 +173,10 @@ describe('Student component integration test', () => {
       fixture.nativeElement.querySelector(
         `[${SELECTORS.closeStudentDetailModal}]`,
       ) as HTMLButtonElement | null,
+    emptyStudentsState: () =>
+      fixture.nativeElement.querySelector(
+        `[${SELECTORS.emptyStudentsState}]`,
+      ) as HTMLElement | null,
   };
 
   beforeEach(async () => {
@@ -185,16 +213,11 @@ describe('Student component integration test', () => {
             delete: jest.fn(),
           },
         },
-        {
-          provide: AuthService,
-          useValue: { saveToken: jest.fn() },
-        },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(StudentsComponent);
     component = fixture.componentInstance;
-    authService = TestBed.inject(AuthService);
     fixture.detectChanges();
   });
 
@@ -209,7 +232,10 @@ describe('Student component integration test', () => {
     expect(ui.deleteStudent()).toBeTruthy();
   });
 
-  it('should display student details in a modal when view button is clicked', () => {
+  // TO DO: Implement logout test case
+  it('should logout the user and navigate to login page when logout button is clicked', () => {});
+
+  it('should GET and display student details in a modal when view button is clicked', () => {
     (component as any).studentService.getById.mockReturnValue(
       of({
         id: 1,
@@ -235,7 +261,7 @@ describe('Student component integration test', () => {
     expect(ui.studentDetail()).toBeFalsy();
   });
 
-  it('should add a new student and display it in the list', () => {
+  it('should ADD a new student and display it in the list', () => {
     ui.addStudentBtn()?.click();
     fixture.detectChanges();
     expect(ui.studentEditForm()).toBeTruthy();
@@ -279,5 +305,103 @@ describe('Student component integration test', () => {
 
     expect(ui.studentEditForm()).not.toBeTruthy();
     expect(ui.studentRow()).toBeTruthy();
+  });
+
+  it('should EDIT student details and update the list', () => {
+    (component as any).studentService.getById.mockReturnValue(
+      of({
+        id: 1,
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john@doe.com',
+      }),
+    );
+
+    ui.editStudent()?.click();
+    fixture.detectChanges();
+
+    expect(ui.studentEditForm()).toBeTruthy();
+    expect(ui.studentFormModalTitle()?.textContent).toContain(
+      'Modifier un étudiant',
+    );
+
+    ui.studentFirstNameInput()!.value = 'Jane';
+    ui.studentFirstNameInput()!.dispatchEvent(new Event('input'));
+    ui.studentLastNameInput()!.value = 'Smith';
+    ui.studentLastNameInput()!.dispatchEvent(new Event('input'));
+    ui.studentEmailInput()!.value = 'jane@smith.com';
+    ui.studentEmailInput()!.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(component.studentForm.valid).toBe(true);
+
+    (component as any).studentService.update.mockReturnValue(
+      of({
+        id: 1,
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'jane@smith.com',
+        created_at: '',
+        updated_at: '',
+      }),
+    );
+
+    ui.studentFormSubmitBtn()?.click();
+    fixture.detectChanges();
+
+    expect(ui.studentSuccessToast()?.textContent).toContain(
+      'Étudiant modifié avec succès.',
+    );
+
+    expect(component.students[0].firstName).toBe('Jane');
+    expect(component.students[0].lastName).toBe('Smith');
+    expect(component.students[0].email).toBe('jane@smith.com');
+
+    expect(ui.studentEditForm()).not.toBeTruthy();
+    expect(ui.studentRow()).toBeTruthy();
+  });
+
+  it('should DELETE a student and remove it from the list', () => {
+    (component as any).studentService.delete.mockReturnValue(of(void 0));
+
+    ui.deleteStudent()?.click();
+    fixture.detectChanges();
+
+    expect(ui.studentDeleteModal()).toBeTruthy();
+    expect(ui.studentDeleteModalMessage()?.textContent).toContain('John Doe');
+
+    ui.cancelStudentDeleteBtn()?.click();
+    fixture.detectChanges();
+
+    expect(ui.studentDeleteModal()).toBeFalsy();
+    expect(component.students.length).toBe(2);
+
+    ui.deleteStudent()?.click();
+    fixture.detectChanges();
+
+    ui.confirmStudentDeleteBtn()?.click();
+    fixture.detectChanges();
+
+    expect((component as any).studentService.delete).toHaveBeenCalledWith(1);
+    expect(ui.studentSuccessToast()?.textContent).toContain(
+      'Étudiant supprimé avec succès.',
+    );
+    expect(component.students.length).toBe(1);
+    expect(component.students[0].id).toBe(2);
+    expect(ui.studentRow()).toBeFalsy();
+
+    ui.deleteStudentTwo()?.click();
+    fixture.detectChanges();
+
+    expect(ui.studentDeleteModalMessage()?.textContent).toContain('John Doe');
+
+    ui.confirmStudentDeleteBtn()?.click();
+    fixture.detectChanges();
+
+    expect((component as any).studentService.delete).toHaveBeenCalledWith(2);
+    expect(component.students.length).toBe(0);
+    expect(ui.emptyStudentsState()?.textContent).toContain(
+      'Aucun étudiant trouvé.',
+    );
   });
 });

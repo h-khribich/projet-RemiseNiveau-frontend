@@ -42,6 +42,11 @@
   color: #1f2937;
 }
 
+.btn-danger {
+  background: #c62828;
+  color: #ffffff;
+}
+
 .toast-container {
   position: fixed;
   top: 24px;
@@ -149,6 +154,10 @@ th {
   box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
 }
 
+.modal-card-sm {
+  width: min(100%, 440px);
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -195,6 +204,12 @@ th {
   display: flex;
   gap: 12px;
   margin-top: 20px;
+}
+
+.modal-description {
+  margin: 0;
+  color: #334155;
+  line-height: 1.5;
 }
 
 .detail-grid p {

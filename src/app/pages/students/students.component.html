@@ -72,7 +72,7 @@
                 <button class="icon-button" type="button" (click)="openEditModal(student)" title="Modifier" [attr.data-test]="'editStudentBtn-' + student.id">
                   ✏️
                 </button>
-                <button class="icon-button delete-button" type="button" (click)="deleteStudent(student)" title="Supprimer" [attr.data-test]="'deleteStudentBtn-' + student.id">
+                <button class="icon-button delete-button" type="button" (click)="openDeleteModal(student)" title="Supprimer" [attr.data-test]="'deleteStudentBtn-' + student.id">
                   ❌
                 </button>
               </td>
@@ -172,6 +172,30 @@
           <p data-test="studentDetailEmail"><strong>Email :</strong> {{ selectedStudent.email }}</p>
           <p data-test="studentDetailCreatedAt"><strong>Créé le :</strong> {{ selectedStudent.created_at }}</p>
           <p data-test="studentDetailUpdatedAt"><strong>Modifié le :</strong> {{ selectedStudent.updated_at }}</p>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (isDeleteModalOpen && studentPendingDeletion) {
+    <div class="modal-backdrop" (click)="closeDeleteModal()" data-test="studentDeleteModalBackdrop">
+      <div class="modal-card modal-card-sm" (click)="$event.stopPropagation()" data-test="studentDeleteModal">
+        <div class="modal-header" data-test="studentDeleteModalHeader">
+          <h3 data-test="studentDeleteModalTitle">Confirmer la suppression</h3>
+          <button class="close-button" type="button" (click)="closeDeleteModal()" data-test="closeStudentDeleteModalBtn">❌</button>
+        </div>
+
+        <p class="modal-description" data-test="studentDeleteModalMessage">
+          Voulez-vous vraiment supprimer l'étudiant {{ studentPendingDeletion.firstName }} {{ studentPendingDeletion.lastName }} ?
+        </p>
+
+        <div class="modal-actions" data-test="studentDeleteActions">
+          <button class="btn btn-danger" type="button" (click)="confirmDeleteStudent()" [disabled]="isLoading" data-test="confirmStudentDeleteBtn">
+            Supprimer
+          </button>
+          <button class="btn btn-secondary" type="button" (click)="closeDeleteModal()" data-test="cancelStudentDeleteBtn">
+            Annuler
+          </button>
         </div>
       </div>
     </div>
