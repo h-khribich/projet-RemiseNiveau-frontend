@@ -1,3 +1,5 @@
+/// <reference types="jest" />
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RegisterComponent } from '../app/pages/register/register.component';
 import { provideRouter } from '@angular/router';
@@ -23,7 +25,7 @@ const SELECTORS = {
   loginInput: 'data-test="registerLoginInput"',
   passwordInput: 'data-test="registerPasswordInput"',
   registerBtn: 'data-test="registerSubmitBtn"',
-  loginBtn: 'data-test="LoginRedirectBtn"',
+  loginBtn: 'data-test="loginRedirectBtn"',
   firstNameInputError: 'data-test="firstNameInputError"',
   lastNameInputError: 'data-test="lastNameInputError"',
   loginInputError: 'data-test="registerLoginInputError"',

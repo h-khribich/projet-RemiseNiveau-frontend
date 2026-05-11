@@ -1,8 +1,9 @@
+/// <reference types="jest" />
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StudentsComponent } from '../app/pages/students/students.component';
 import { provideRouter } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { StudentService } from '../app/core/service/student.service';
 
 // Test data
